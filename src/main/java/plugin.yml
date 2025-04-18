@@ -1,0 +1,11 @@
+api-version: 1.19
+name: HCM
+version: 1.0
+author: TNAR5
+main: hotl.hcm.HCM
+description: Minecraft hcm plugin.
+
+commands:
+  hcm:
+    aliases: [hcm]
+    description: hcm base command.

@@ -1,0 +1,42 @@
+# Eclipse project files
+.classpath
+.project
+.settings/
+
+# Java build files
+bin/
+build/
+target/
+
+# Maven
+log/
+*.log
+*.tmp
+
+# Gradle
+.gradle/
+build/
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Backup files
+*~ 
+*.swp
+
+# Mac OS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Other IDEs
+.idea/
+*.iml
+.vscode/
