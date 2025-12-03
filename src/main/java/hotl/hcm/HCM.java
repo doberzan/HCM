@@ -11,6 +11,7 @@ import hotl.hcm.listeners.EntityDamageListener;
 import hotl.hcm.listeners.EntityDeathListener;
 import hotl.hcm.listeners.PlayerAchievementAwardedListener;
 import hotl.hcm.listeners.PlayerChangeWorldListener;
+import hotl.hcm.listeners.PlayerChatListener;
 import hotl.hcm.listeners.PlayerDeathListener;
 import hotl.hcm.listeners.PlayerInteractListener;
 import hotl.hcm.listeners.PlayerJoinListener;
@@ -51,7 +52,10 @@ public class HCM extends JavaPlugin{
 		getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
+		getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
 		getLogger().info("HCM is now enabled...");
+		
+		//Bukkit.getScheduler().runTaskTimer(this, new DragonBomb(this),0, 20*30);
 		
 	}
 	

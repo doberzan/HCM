@@ -41,7 +41,7 @@ public class PlayerRespawnListener implements Listener {
 			deadplayer.setGameMode(GameMode.ADVENTURE);
 			deadplayer.sendMessage(HCM.formatHCM(
 					"You have lost your ability to do most things except for fight. This is your last chance don't mess it up!"));
-			final String playername = deadplayer.getDisplayName();
+			final String playername = deadplayer.getName();
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 				public void run() {
 					Bukkit.getPlayer(playername).setGameMode(GameMode.ADVENTURE);

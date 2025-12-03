@@ -9,7 +9,11 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,6 +54,23 @@ public class HCMCommands implements CommandExecutor, TabCompleter {
 				player.sendMessage(
 						HCM.formatHCM("Starting game at " + ChatColor.AQUA + game.getGameStartTime().format(f)));
 				game.setGameRunning(true);
+				World w = Bukkit.getWorld("world");
+				w.setTime(1000);
+				w.setStorm(false);
+			    w.setThundering(false);
+			    w.setWeatherDuration(0);
+			    for (World world : Bukkit.getWorlds()) {
+		            world.setDifficulty(Difficulty.HARD);
+		        }
+			    for(Player p:Bukkit.getOnlinePlayers()) 
+			    {
+			    	p.getInventory().clear();
+			    	p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
+			    	p.setFoodLevel(20);
+			    	p.setSaturation(20f);
+			    	p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_IRON_XYLOPHONE, 1, 1);
+			    	p.sendMessage(HCM.formatHCM("Slay the dragon..."));
+			    }
 				return true;
 			}
 			if (args.length > 2 && args[0].equalsIgnoreCase("setmode") && sender.isOp()) {

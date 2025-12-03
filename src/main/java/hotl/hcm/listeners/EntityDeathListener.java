@@ -12,7 +12,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Blaze;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Silverfish;
@@ -42,7 +44,7 @@ public class EntityDeathListener implements Listener {
 	
 	public void postGameMobSpawn() 
 	{
-		Location loc = new Location(Bukkit.getWorld("world_the_end"), 5,70,0);
+		Location loc = new Location(Bukkit.getWorld("world_the_end"), 5,68,0);
 		new SilverfishSpawnerTask(loc).runTaskTimer(plugin, 0L, 20L * 10);
 	}
 
@@ -110,7 +112,7 @@ public class EntityDeathListener implements Listener {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 
 					World w = p.getWorld();
-					w.playSound(p.getLocation(), Sound.ENTITY_WOLF_HOWL, 0.5f, 1);
+					w.playSound(p.getLocation(), Sound.ITEM_GOAT_HORN_SOUND_5, 0.5f, 1);
 					StructureSearchResult loc = Bukkit.getServer().getWorld("world_nether").locateNearestStructure(
 							new Location(Bukkit.getServer().getWorld("world_nether"), 0, 0, 0), Structure.FORTRESS,
 							1000, false);
@@ -148,11 +150,23 @@ class SilverfishSpawnerTask extends BukkitRunnable {
 			this.cancel();
 		}
 		currWave ++;
-		for(int i = 0; i < 30; i ++) 
+		for(int i = 0; i < 100; i ++) 
 		{
 			Silverfish silverfish = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
             silverfish.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "Dragon's Revenge");
             silverfish.addPotionEffect(speedEffect);
+		}
+		for(int i = 0; i < 20; i ++) 
+		{
+			Blaze blaze = (Blaze) location.getWorld().spawnEntity(location.clone().add(0,20,0), EntityType.BLAZE);
+			blaze.setCustomName(ChatColor.BOLD + "" + ChatColor.RED + "Dragon's Revenge");
+			blaze.addPotionEffect(speedEffect);
+		}
+		for(int i = 0; i < 20; i ++) 
+		{
+			Ghast ghast = (Ghast) location.getWorld().spawnEntity(location.clone().add(0,20,0), EntityType.GHAST);
+			ghast.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
+			ghast.addPotionEffect(speedEffect);
 		}
 		
 	}
