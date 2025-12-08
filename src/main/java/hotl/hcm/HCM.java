@@ -1,7 +1,6 @@
 package hotl.hcm;
 
-
-
+import hotl.hcm.runnables.EndEffects;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,10 +21,11 @@ public class HCM extends JavaPlugin{
 
 	private static int PLAYER_TOTAL = 5;
 	
-	public static final int REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS = PLAYER_TOTAL*60;
+	public int REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS = PLAYER_TOTAL*60;
 	public HCMGame game;
 	public HCMGameSave gameSave;
 	public HCMCommands HCMCommands;
+
 	public static String formatHCM(String msg)
 	{
 		String header = ChatColor.YELLOW + "" +  ChatColor.BOLD + "[" + ChatColor.RED + ChatColor.BOLD + "HCM" + ChatColor.YELLOW + ChatColor.BOLD + "]";
@@ -56,6 +56,7 @@ public class HCM extends JavaPlugin{
 		getLogger().info("HCM is now enabled...");
 		
 		//Bukkit.getScheduler().runTaskTimer(this, new DragonBomb(this),0, 20*30);
+		Bukkit.getScheduler().runTaskTimer(this, new EndEffects(this), 0, 20*20);
 		
 	}
 	

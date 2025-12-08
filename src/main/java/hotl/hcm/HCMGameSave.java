@@ -26,10 +26,12 @@ public class HCMGameSave {
 	}
 
 	public void loadDataForMatch(UUID uid) {
-		File save = new File(uid.toString() + ".json");
+		File save = new File(plugin.getDataFolder(),uid.toString() + ".json");
 		JsonObject match = null;
 
 		if (!save.exists()) {
+			plugin.getLogger().info(
+					"No save data found for current world! Generating new save...");
 			return;
 		}
 
@@ -57,6 +59,8 @@ public class HCMGameSave {
 				p.setEnteredEnd(value.getAsJsonObject().get("enteredEnd").getAsBoolean());
 				p.setEnteredNether(value.getAsJsonObject().get("enteredNether").getAsBoolean());
 				p.setCauseOfDeath(value.getAsJsonObject().get("causeOfDeath").getAsString());
+				p.setTimeOfDeath(LocalDateTime.parse(match.get("timeOfDeath").getAsString(),
+						DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 				game.HCMPlayers.put(UUID.fromString(key), p);
 				plugin.getLogger().info(
 						"Loaded player data for " + key + ": " + value.getAsJsonObject().get("name").getAsString());
@@ -81,7 +85,7 @@ public class HCMGameSave {
 	}
 
 	public void saveDataForMatch(UUID uid) {
-		File save = new File(uid.toString() + ".json");
+		File save = new File(plugin.getDataFolder(),uid.toString() + ".json");
 		Duration duration = Duration.between(game.getGameStartTime(), LocalDateTime.now());
 		if(game.isGameFinished()) {
 			duration = Duration.between(game.getGameStartTime(), game.getGameEndTime());
@@ -101,21 +105,27 @@ public class HCMGameSave {
 		match.addProperty("enderDragonIsDead", game.isEnderDragonIsDead());
 		match.addProperty("witherIsDead", game.isWitherIsDead());
 		match.addProperty("mobsKilled", game.getMobsKilled());
-		
+
 		for (HCMPlayer p : plugin.game.HCMPlayers.values()) {
-			JsonObject playerData = new JsonObject();
-			
-			playerData.addProperty("name", p.getPlayer().getDisplayName());
-			playerData.addProperty("kills", p.getMobKills());
-			playerData.addProperty("mode", p.getPlayerMode());
-			playerData.addProperty("killedEnderDragon", p.isKilledEnderDragon());
-			playerData.addProperty("killedGuardian", p.isKilledGuardian());
-			playerData.addProperty("killedWither", p.isKilledWither());
-			playerData.addProperty("enteredBastion", p.isEnteredBastion());
-			playerData.addProperty("enteredEnd", p.isEnteredEnd());
-			playerData.addProperty("enteredNether", p.isEnteredNether());
-			playerData.addProperty("causeOfDeath", p.getCauseOfDeath());
-			players.add(p.getPlayer().getUniqueId().toString(), playerData);
+			try {
+				JsonObject playerData = new JsonObject();
+
+				playerData.addProperty("name", p.getPlayer().getName());
+				playerData.addProperty("kills", p.getMobKills());
+				playerData.addProperty("mode", p.getPlayerMode());
+				playerData.addProperty("killedEnderDragon", p.isKilledEnderDragon());
+				playerData.addProperty("killedGuardian", p.isKilledGuardian());
+				playerData.addProperty("killedWither", p.isKilledWither());
+				playerData.addProperty("enteredBastion", p.isEnteredBastion());
+				playerData.addProperty("enteredEnd", p.isEnteredEnd());
+				playerData.addProperty("enteredNether", p.isEnteredNether());
+				playerData.addProperty("causeOfDeath", p.getCauseOfDeath());
+				playerData.addProperty("timeOfDeath", p.getTimeOfDeath().toString());
+				players.add(p.getPlayer().getUniqueId().toString(), playerData);
+			} catch (Exception e)
+			{
+				plugin.getLogger().info("Could not save player data for a player.");
+			}
 		}
 
 		match.add("players", players);

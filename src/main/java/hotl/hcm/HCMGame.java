@@ -1,5 +1,8 @@
 package hotl.hcm;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.UUID;
@@ -19,10 +22,10 @@ public class HCMGame {
 	private boolean witherIsDead;
 	private int mobsKilled;
 
-	private HCM plugin;
+	private HCM hcm;
 
-	public HCMGame(HCM plugin) {
-		this.plugin = plugin;
+	public HCMGame(HCM hcm) {
+		this.hcm = hcm;
 		HCMPlayers = new HashMap<UUID,HCMPlayer>();
 		gameStartTime = LocalDateTime.now();
 		gameEndTime = LocalDateTime.now();
@@ -95,5 +98,23 @@ public class HCMGame {
 
 	public void setWitherIsDead(boolean witherIsDead) {
 		this.witherIsDead = witherIsDead;
+	}
+
+	public void resetGame() {
+		setGameRunning(false);
+		setGameStartTime(LocalDateTime.now());
+		setGameEndTime(LocalDateTime.now());
+		setGameFinished(false);
+		setMobsKilled(0);
+		setWitherIsDead(false);
+		setGuardianIsDead(false);
+		setEnderDragonIsDead(false);
+
+		// Reset player data
+		HCMPlayers.clear();
+		for (Player p : Bukkit.getOnlinePlayers())
+		{
+			HCMPlayers.put(p.getUniqueId(), new HCMPlayer(p));
+		}
 	}
 }

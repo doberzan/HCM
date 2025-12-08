@@ -32,7 +32,13 @@ public class PlayerRespawnListener implements Listener {
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Player deadplayer = event.getPlayer();
-		
+
+        // Do nothing if game is over or not started.
+        if (!plugin.game.isGameRunning())
+        {
+            return;
+        }
+
 		if (game.HCMPlayers.get(deadplayer.getUniqueId()).getPlayerMode() == 2) {
 			deadplayer.setGameMode(GameMode.SPECTATOR);
 		}

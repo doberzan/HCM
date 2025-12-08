@@ -25,7 +25,11 @@ public class PlayerAchievementAwardedListener implements Listener {
 
 	@EventHandler
 	public void onPlayerAchievement(PlayerAdvancementDoneEvent event) {
-
+		// Do nothing if game has not started
+		if(!plugin.game.isGameRunning())
+		{
+			return;
+		}
 		if (event.getAdvancement().getKey().getKey().equals("nether/find_bastion")) {
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				World w = p.getWorld();

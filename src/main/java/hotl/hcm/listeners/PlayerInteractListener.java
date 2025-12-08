@@ -25,6 +25,11 @@ public class PlayerInteractListener implements Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		if(!game.isGameRunning() && !event.getPlayer().isOp() && !game.isGameFinished())
+		{
+			event.setCancelled(true);
+			return;
+		}
 		if (event.getItem() != null) {
 			if (event.getItem().getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Token of Chance")) {
 				if (game.HCMPlayers.get(event.getPlayer().getUniqueId()).getPlayerMode() == 1) {

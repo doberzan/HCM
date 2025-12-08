@@ -24,7 +24,6 @@ public class PlayerJoinListener implements Listener{
 	@EventHandler
 	public void playerJoin(PlayerJoinEvent event) 
 	{
-		
 		if(game.HCMPlayers.keySet().contains(event.getPlayer().getUniqueId())) 
 		{
 			// Replace old player object for rejoined player

@@ -1,9 +1,13 @@
 package hotl.hcm.listeners;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import hotl.hcm.HCMPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -38,19 +42,26 @@ public class PlayerDeathListener implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player deadplayer = (Player) event.getEntity();
 
+		// Do nothing if game is over or not started.
+		if (!plugin.game.isGameRunning())
+		{
+			return;
+		}
+
 		// Players first death
 		if (game.HCMPlayers.get(deadplayer.getUniqueId()).getPlayerMode() == 0) {
 			
 			game.HCMPlayers.get(deadplayer.getUniqueId()).setPlayerMode(1);
+			game.HCMPlayers.get(deadplayer.getUniqueId()).setTimeOfDeath(LocalDateTime.now());
 			if (deadplayer.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
 	            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) deadplayer.getLastDamageCause();
 	            Entity killer = damageEvent.getDamager();
 
-	            // Check if the killer is a LivingEntity (e.g., player, mob, etc.)
+	            // Check if the killer is a LivingEntity
 	            if (killer instanceof LivingEntity) {
 	                LivingEntity livingKiller = (LivingEntity) killer;
 	                game.HCMPlayers.get(deadplayer.getUniqueId()).setCauseOfDeath(livingKiller+ ":" + deadplayer.getLastDamageCause().getCause().toString());
-	            }else 
+	            }else
 	            {
 		        	game.HCMPlayers.get(deadplayer.getUniqueId()).setCauseOfDeath(event.getDeathMessage()+ ":" + deadplayer.getLastDamageCause().getCause().toString());
 	            }
@@ -60,6 +71,38 @@ public class PlayerDeathListener implements Listener {
 	        }
 			
 			playerList = new ArrayList<Player>(Bukkit.getOnlinePlayers());
+			// Get count of alive players
+			int aliveCount = 0;
+			for (HCMPlayer hcmPlayer : game.HCMPlayers.values())
+			{
+				if (hcmPlayer.getPlayerMode() == 0)
+				{
+					aliveCount ++;
+				}
+			}
+
+			// All players are dead
+			if (aliveCount == 0)
+			{
+				for (Player p : playerList) {
+					game.setGameFinished(true);
+					game.setGameRunning(false);
+					game.setGameEndTime(LocalDateTime.now());
+
+					Duration duration = Duration.between(game.getGameStartTime(), game.getGameEndTime());
+					deadplayer.getWorld().strikeLightningEffect(deadplayer.getLocation());
+					deadplayer.getWorld().strikeLightningEffect(deadplayer.getLocation());
+					World w = p.getWorld();
+					w.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 100, 1);
+					w.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 50, 1);
+					p.sendTitle(ChatColor.LIGHT_PURPLE + deadplayer.getName(), ChatColor.GREEN + "is bad at minecraft", 30,
+							200, 30);
+					p.sendMessage(HCM.formatHCM(ChatColor.RED + "Everyone is dead! Speed run failed :("));
+					p.sendMessage(HCM.formatHCM("Final game duration: " + ChatColor.AQUA + "" + String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60)));
+				}
+				return;
+			}
+
 			for (Player p : playerList) {
 				World w = p.getWorld();
 				w.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 100, 1);
@@ -70,9 +113,11 @@ public class PlayerDeathListener implements Listener {
 						+ " has lost their MINING privileges!"));
 				p.sendMessage(HCM.formatHCM(ChatColor.GOLD + "They have been assigned to" + ChatColor.RED
 						+ " protection " + ChatColor.GOLD + "duty!"));
+				p.sendMessage(HCM.formatHCM(ChatColor.RED + "There are " + ChatColor.RED + aliveCount + ChatColor.GOLD + " hardcore players remaining!"));
 				deadplayer.getWorld().strikeLightningEffect(deadplayer.getLocation());
 				deadplayer.getWorld().strikeLightningEffect(deadplayer.getLocation());
 			}
+
 		}else 
 		{
 			game.HCMPlayers.get(deadplayer.getUniqueId()).setPlayerMode(2);

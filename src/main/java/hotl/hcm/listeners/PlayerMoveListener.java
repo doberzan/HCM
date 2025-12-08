@@ -19,7 +19,7 @@ public class PlayerMoveListener implements Listener{
 	
 	@EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-		if(!game.isGameRunning() && !event.getPlayer().isOp()) 
+		if(!game.isGameRunning() && !event.getPlayer().isOp() && !game.isGameFinished())
 		{
 			event.setCancelled(true);
 		}

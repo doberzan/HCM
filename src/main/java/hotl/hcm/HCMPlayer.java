@@ -3,6 +3,8 @@ package hotl.hcm;
 
 import org.bukkit.entity.Player;
 
+import java.time.LocalDateTime;
+
 public class HCMPlayer {
 	private Player player;
 	private int playerMode;
@@ -13,6 +15,7 @@ public class HCMPlayer {
 	private boolean enteredBastion;
 	private boolean enteredEnd;
 	private boolean enteredNether;
+	private LocalDateTime timeOfDeath;
 	private String causeOfDeath;
 	
 	// Modes: alive: 0, protection: 1, spectate: 2
@@ -111,4 +114,11 @@ public class HCMPlayer {
 	}
 
 
+    public LocalDateTime getTimeOfDeath() {
+        return timeOfDeath;
+    }
+
+    public void setTimeOfDeath(LocalDateTime timeOfDeath) {
+        this.timeOfDeath = timeOfDeath;
+    }
 }

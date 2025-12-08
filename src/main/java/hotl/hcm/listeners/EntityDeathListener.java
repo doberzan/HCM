@@ -12,12 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Silverfish;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -45,13 +40,18 @@ public class EntityDeathListener implements Listener {
 	public void postGameMobSpawn() 
 	{
 		Location loc = new Location(Bukkit.getWorld("world_the_end"), 5,68,0);
-		new SilverfishSpawnerTask(loc).runTaskTimer(plugin, 0L, 20L * 10);
+		new SilverfishSpawnerTask(loc, plugin).runTaskTimer(plugin, 20*40L, 20L * 10);
 	}
 
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		LivingEntity mob = event.getEntity();
-		
+
+		// Do nothing if game has not started
+		if(!plugin.game.isGameRunning())
+		{
+			return;
+		}
 		if (mob.getKiller() != null && mob.getKiller().getType() == EntityType.PLAYER) {
 			Player player = (Player) event.getEntity().getKiller();
 			// Elder Guardian has been killed by a player
@@ -79,7 +79,7 @@ public class EntityDeathListener implements Listener {
 			}
 			
 			if (mob.getType() == EntityType.ENDER_DRAGON && game.isGameRunning() && !game.isGameFinished()) {
-				
+				game.setGameFinished(true);
 				game.setGameRunning(false);
 				game.setGameEndTime(LocalDateTime.now());
 				game.setEnderDragonIsDead(true);
@@ -91,9 +91,8 @@ public class EntityDeathListener implements Listener {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					p.sendMessage(HCM.formatHCM(ChatColor.LIGHT_PURPLE + player.getDisplayName() + ChatColor.YELLOW
 							+ " has defeated the Ender Dragon!"));
-					p.sendMessage(HCM.formatHCM("Total game time was: " + ChatColor.AQUA + duration.toHours() + ":" + duration.toMinutes() % 60 + ":" + duration.getSeconds() % 60));
+					p.sendMessage(HCM.formatHCM("Total game time was: " + ChatColor.AQUA + String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60)));
 				}
-				
 				postGameMobSpawn();
 			}
 			
@@ -108,7 +107,7 @@ public class EntityDeathListener implements Listener {
 			HCMPlayer ps = game.HCMPlayers.get(player.getUniqueId());
 			ps.setMobKills(ps.getMobKills()+1);
 
-			if (game.getMobsKilled() == HCM.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS) {
+			if (game.getMobsKilled() == plugin.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS) {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 
 					World w = p.getWorld();
@@ -121,13 +120,13 @@ public class EntityDeathListener implements Listener {
 									+ ChatColor.BOLD + ChatColor.GREEN + "" + loc.getLocation().getBlockX() + ", " + loc.getLocation().getBlockZ() + ChatColor.GOLD + "!"));
 				}
 
-			} else if (game.getMobsKilled() % (HCM.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS / 6) == 0 && game.getMobsKilled() < HCM.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS) {
+			} else if (game.getMobsKilled() % (plugin.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS / 6) == 0 && game.getMobsKilled() < plugin.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS) {
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					World w = p.getWorld();
 					w.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
 					p.sendMessage(HCM.formatHCM(
 							ChatColor.LIGHT_PURPLE + "" + mob.getKiller().getName() + ChatColor.GREEN + " killed " + ChatColor.GOLD + "" + mob.getType().name() + ChatColor.GREEN + " for a total of "+ ChatColor.AQUA + "" +  game.getMobsKilled() + ChatColor.GREEN + " out of " + ChatColor.AQUA
-									+ HCM.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS + ChatColor.GREEN + " mobs killed!"));
+									+ plugin.REQUIRED_MOB_KILLS_FOR_NETHER_FORTRESS + ChatColor.GREEN + " mobs killed!"));
 				}
 			}
 		}
@@ -138,10 +137,19 @@ class SilverfishSpawnerTask extends BukkitRunnable {
 	private final Location location;
 	private int waves;
 	private int currWave;
-    public SilverfishSpawnerTask(Location location) {
+    public SilverfishSpawnerTask(Location location, HCM hcm) {
         this.location = location;
         this.waves = 10;
         this.currWave = 0;
+		Bukkit.getScheduler().runTaskLater(hcm, () -> {
+			for (Player p : Bukkit.getOnlinePlayers())
+			{
+				p.teleport(location.subtract(0,2,0));
+				p.setGameMode(GameMode.SURVIVAL);
+				p.sendMessage(HCM.formatHCM("Something isn't right..."));
+				p.sendMessage(HCM.formatHCM(ChatColor.RED + "" + ChatColor.BOLD + "You should run"));
+			}
+		}, 20*30);
     }
 	public void run() {
 		PotionEffect speedEffect = new PotionEffect(PotionEffectType.SPEED, PotionEffect.INFINITE_DURATION, 3);
@@ -150,6 +158,22 @@ class SilverfishSpawnerTask extends BukkitRunnable {
 			this.cancel();
 		}
 		currWave ++;
+		if (currWave == 4)
+		{
+			for(int i = 0; i < 4; i ++) {
+				Wither wither = (Wither) location.getWorld().spawnEntity(location, EntityType.WITHER);
+				wither.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
+			}
+			return;
+		}
+		if (currWave == 2)
+		{
+			for(int i = 0; i < 20; i ++) {
+				Warden warden = (Warden) location.getWorld().spawnEntity(location, EntityType.WARDEN);
+				warden.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
+			}
+			return;
+		}
 		for(int i = 0; i < 100; i ++) 
 		{
 			Silverfish silverfish = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
