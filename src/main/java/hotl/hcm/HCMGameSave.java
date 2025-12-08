@@ -98,7 +98,7 @@ public class HCMGameSave {
 		match.addProperty("game_start_time", game.getGameStartTime().toString());
 		match.addProperty("game_end_time", game.getGameEndTime().toString());
 		match.addProperty("game_duration",
-				duration.toHours() + ":" + duration.toMinutes() % 60 + ":" + duration.getSeconds() % 60);
+				String.format("%d:%02d:%02d", duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60));
 		match.addProperty("game_running", game.isGameRunning());
 		match.addProperty("game_finished", game.isGameFinished());
 		match.addProperty("guardianIsDead", game.isGuardianIsDead());
