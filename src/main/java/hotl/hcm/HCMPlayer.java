@@ -9,12 +9,20 @@ public class HCMPlayer {
 	private Player player;
 	private int playerMode;
 	private int mobKills;
+	private int copperMined;
+	private int ironMined;
+	private int goldMined;
+	private int diamondMined;
+	private int endermanKilled;
+	private int blazeKilled;
 	private boolean killedEnderDragon;
 	private boolean killedWither;
 	private boolean killedGuardian;
 	private boolean enteredBastion;
 	private boolean enteredEnd;
 	private boolean enteredNether;
+	private LocalDateTime enteredNetherTime;
+	private LocalDateTime enteredEndTime;
 	private LocalDateTime timeOfDeath;
 	private String causeOfDeath;
 	
@@ -22,6 +30,13 @@ public class HCMPlayer {
 	
 	public HCMPlayer(Player player) 
 	{
+		this.setEndermanKilled(0);
+		this.setBlazeKilled(0);
+		this.setCopperMined(0);
+		this.setIronMined(0);
+		this.setGoldMined(0);
+		this.setDiamondMined(0);
+		this.setTimeOfDeath(LocalDateTime.of(1970, 1, 1, 0, 0, 0));
 		this.setCauseOfDeath("");
 		this.setMobKills(0);
 		this.setPlayerMode(0);
@@ -120,5 +135,69 @@ public class HCMPlayer {
 
     public void setTimeOfDeath(LocalDateTime timeOfDeath) {
         this.timeOfDeath = timeOfDeath;
+    }
+
+    public LocalDateTime getEnteredNetherTime() {
+        return enteredNetherTime;
+    }
+
+    public void setEnteredNetherTime(LocalDateTime enteredNetherTime) {
+        this.enteredNetherTime = enteredNetherTime;
+    }
+
+    public LocalDateTime getEnteredEndTime() {
+        return enteredEndTime;
+    }
+
+    public void setEnteredEndTime(LocalDateTime enteredEndTime) {
+        this.enteredEndTime = enteredEndTime;
+    }
+
+    public int getCopperMined() {
+        return copperMined;
+    }
+
+    public void setCopperMined(int copperMined) {
+        this.copperMined = copperMined;
+    }
+
+    public int getIronMined() {
+        return ironMined;
+    }
+
+    public void setIronMined(int ironMined) {
+        this.ironMined = ironMined;
+    }
+
+    public int getGoldMined() {
+        return goldMined;
+    }
+
+    public void setGoldMined(int goldMined) {
+        this.goldMined = goldMined;
+    }
+
+    public int getDiamondMined() {
+        return diamondMined;
+    }
+
+    public void setDiamondMined(int diamondMined) {
+        this.diamondMined = diamondMined;
+    }
+
+    public int getEndermanKilled() {
+        return endermanKilled;
+    }
+
+    public void setEndermanKilled(int endermanKilled) {
+        this.endermanKilled = endermanKilled;
+    }
+
+    public int getBlazeKilled() {
+        return blazeKilled;
+    }
+
+    public void setBlazeKilled(int blazeKilled) {
+        this.blazeKilled = blazeKilled;
     }
 }

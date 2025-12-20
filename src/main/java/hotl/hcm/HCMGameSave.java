@@ -47,23 +47,37 @@ public class HCMGameSave {
 
 			// Load player data
 			for (Entry<String, JsonElement> entry : match.getAsJsonObject("players").entrySet()) {
-				String key = entry.getKey();
-				JsonElement value = entry.getValue();
-				HCMPlayer p = new HCMPlayer(null);
-				p.setMobKills(value.getAsJsonObject().get("kills").getAsInt());
-				p.setPlayerMode(value.getAsJsonObject().get("mode").getAsInt());
-				p.setKilledEnderDragon(value.getAsJsonObject().get("killedEnderDragon").getAsBoolean());
-				p.setKilledWither(value.getAsJsonObject().get("killedWither").getAsBoolean());
-				p.setKilledGuardian(value.getAsJsonObject().get("killedGuardian").getAsBoolean());
-				p.setEnteredBastion(value.getAsJsonObject().get("enteredBastion").getAsBoolean());
-				p.setEnteredEnd(value.getAsJsonObject().get("enteredEnd").getAsBoolean());
-				p.setEnteredNether(value.getAsJsonObject().get("enteredNether").getAsBoolean());
-				p.setCauseOfDeath(value.getAsJsonObject().get("causeOfDeath").getAsString());
-				p.setTimeOfDeath(LocalDateTime.parse(match.get("timeOfDeath").getAsString(),
-						DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-				game.HCMPlayers.put(UUID.fromString(key), p);
-				plugin.getLogger().info(
-						"Loaded player data for " + key + ": " + value.getAsJsonObject().get("name").getAsString());
+				try {
+					String key = entry.getKey();
+					JsonElement value = entry.getValue();
+					HCMPlayer p = new HCMPlayer(null);
+					p.setMobKills(value.getAsJsonObject().get("kills").getAsInt());
+					p.setEndermanKilled(value.getAsJsonObject().get("endermanKills").getAsInt());
+					p.setBlazeKilled(value.getAsJsonObject().get("blazeKills").getAsInt());
+					p.setCopperMined(value.getAsJsonObject().get("copperMined").getAsInt());
+					p.setIronMined(value.getAsJsonObject().get("ironMined").getAsInt());
+					p.setGoldMined(value.getAsJsonObject().get("goldMined").getAsInt());
+					p.setDiamondMined(value.getAsJsonObject().get("diamondMined").getAsInt());
+					p.setPlayerMode(value.getAsJsonObject().get("mode").getAsInt());
+					p.setKilledEnderDragon(value.getAsJsonObject().get("killedEnderDragon").getAsBoolean());
+					p.setKilledWither(value.getAsJsonObject().get("killedWither").getAsBoolean());
+					p.setKilledGuardian(value.getAsJsonObject().get("killedGuardian").getAsBoolean());
+					p.setEnteredBastion(value.getAsJsonObject().get("enteredBastion").getAsBoolean());
+					p.setEnteredEnd(value.getAsJsonObject().get("enteredEnd").getAsBoolean());
+					p.setEnteredNether(value.getAsJsonObject().get("enteredNether").getAsBoolean());
+					p.setCauseOfDeath(value.getAsJsonObject().get("causeOfDeath").getAsString());
+					p.setTimeOfDeath(LocalDateTime.parse(value.getAsJsonObject().get("timeOfDeath").getAsString(),
+							DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+					game.HCMPlayers.put(UUID.fromString(key), p);
+					plugin.getLogger().info(
+							"Loaded player data for " + key + ": " + value.getAsJsonObject().get("name").getAsString());
+				}catch (Exception e)
+				{
+					plugin.getLogger().info(
+							"Error encountered while loading player data.");
+					plugin.getLogger().info(e.getMessage());
+					e.printStackTrace();
+				}
 			}
 
 			// Load match data
@@ -91,6 +105,8 @@ public class HCMGameSave {
 			duration = Duration.between(game.getGameStartTime(), game.getGameEndTime());
 		}
 
+		// Save game data
+
 		JsonObject match = new JsonObject();
 		JsonObject players = new JsonObject();
 		
@@ -106,12 +122,19 @@ public class HCMGameSave {
 		match.addProperty("witherIsDead", game.isWitherIsDead());
 		match.addProperty("mobsKilled", game.getMobsKilled());
 
+		// Save player data
 		for (HCMPlayer p : plugin.game.HCMPlayers.values()) {
 			try {
 				JsonObject playerData = new JsonObject();
 
 				playerData.addProperty("name", p.getPlayer().getName());
 				playerData.addProperty("kills", p.getMobKills());
+				playerData.addProperty("endermanKills", p.getEndermanKilled());
+				playerData.addProperty("blazeKills", p.getBlazeKilled());
+				playerData.addProperty("copperMined", p.getCopperMined());
+				playerData.addProperty("ironMined", p.getIronMined());
+				playerData.addProperty("goldMined", p.getGoldMined());
+				playerData.addProperty("diamondMined", p.getDiamondMined());
 				playerData.addProperty("mode", p.getPlayerMode());
 				playerData.addProperty("killedEnderDragon", p.isKilledEnderDragon());
 				playerData.addProperty("killedGuardian", p.isKilledGuardian());
@@ -125,6 +148,7 @@ public class HCMGameSave {
 			} catch (Exception e)
 			{
 				plugin.getLogger().info("Could not save player data for a player.");
+				plugin.getLogger().info(e.getMessage());
 			}
 		}
 

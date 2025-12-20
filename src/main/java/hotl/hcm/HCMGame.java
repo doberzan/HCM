@@ -1,7 +1,10 @@
 package hotl.hcm;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,19 +24,30 @@ public class HCMGame {
 	private boolean enderDragonIsDead;
 	private boolean witherIsDead;
 	private int mobsKilled;
-
+	private Scoreboard hcmScoreboard;
+	private Team hcmTeam;
 	private HCM hcm;
 
 	public HCMGame(HCM hcm) {
 		this.hcm = hcm;
+
+		//setupTeam();
+
 		HCMPlayers = new HashMap<UUID,HCMPlayer>();
-		gameStartTime = LocalDateTime.now();
-		gameEndTime = LocalDateTime.now();
+		gameStartTime = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+		gameEndTime = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
 		gameRunning = false;
 		gameFinished = false;
 		guardianIsDead = false;
 		enderDragonIsDead = false;
 		witherIsDead = false;
+	}
+
+	private void setupTeam() {
+		hcmScoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		hcmTeam = hcmScoreboard.registerNewTeam("HCMTeam");
+
+		hcmTeam.setColor(ChatColor.BLUE);
 	}
 
 	public LocalDateTime getGameStartTime() {

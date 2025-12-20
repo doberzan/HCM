@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
+import hotl.hcm.runnables.DragonsRevengeFight;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -40,20 +41,35 @@ public class EntityDeathListener implements Listener {
 	public void postGameMobSpawn() 
 	{
 		Location loc = new Location(Bukkit.getWorld("world_the_end"), 5,68,0);
-		new SilverfishSpawnerTask(loc, plugin).runTaskTimer(plugin, 20*40L, 20L * 10);
+		new DragonsRevengeFight(loc, plugin).runTaskTimer(plugin, 20*40L, 20L * 10);
 	}
 
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		LivingEntity mob = event.getEntity();
 
-		// Do nothing if game has not started
-		if(!plugin.game.isGameRunning())
+		// Do nothing if game has not started or is finished
+		if(!plugin.game.isGameRunning() || plugin.game.isGameFinished())
 		{
 			return;
 		}
+
 		if (mob.getKiller() != null && mob.getKiller().getType() == EntityType.PLAYER) {
 			Player player = (Player) event.getEntity().getKiller();
+			HCMPlayer hcmPlayer = plugin.game.HCMPlayers.get(player.getUniqueId());
+
+			// Player killed enderman
+			if (mob.getType().equals(EntityType.ENDERMAN))
+			{
+				hcmPlayer.setEndermanKilled(hcmPlayer.getEndermanKilled()+1);
+			}
+
+			// Player killed blaze
+			if (mob.getType().equals(EntityType.BLAZE))
+			{
+				hcmPlayer.setBlazeKilled(hcmPlayer.getBlazeKilled()+1);
+			}
+
 			// Elder Guardian has been killed by a player
 			if (mob.getType() == EntityType.ELDER_GUARDIAN) {
 				
@@ -77,7 +93,9 @@ public class EntityDeathListener implements Listener {
 							+ " has defeated the Elder Guardian!"));
 				}
 			}
-			
+
+
+			// Enderdragon is killed by player
 			if (mob.getType() == EntityType.ENDER_DRAGON && game.isGameRunning() && !game.isGameFinished()) {
 				game.setGameFinished(true);
 				game.setGameRunning(false);
@@ -133,66 +151,3 @@ public class EntityDeathListener implements Listener {
 	}
 }
 
-class SilverfishSpawnerTask extends BukkitRunnable {
-	private final Location location;
-	private int waves;
-	private int currWave;
-    public SilverfishSpawnerTask(Location location, HCM hcm) {
-        this.location = location;
-        this.waves = 10;
-        this.currWave = 0;
-		Bukkit.getScheduler().runTaskLater(hcm, () -> {
-			for (Player p : Bukkit.getOnlinePlayers())
-			{
-				p.teleport(location.subtract(0,2,0));
-				p.setGameMode(GameMode.SURVIVAL);
-				p.sendMessage(HCM.formatHCM("Something isn't right..."));
-				p.sendMessage(HCM.formatHCM(ChatColor.RED + "" + ChatColor.BOLD + "You should run"));
-			}
-		}, 20*30);
-    }
-	public void run() {
-		PotionEffect speedEffect = new PotionEffect(PotionEffectType.SPEED, PotionEffect.INFINITE_DURATION, 3);
-		if(currWave > waves) 
-		{
-			this.cancel();
-		}
-		currWave ++;
-		if (currWave == 4)
-		{
-			for(int i = 0; i < 4; i ++) {
-				Wither wither = (Wither) location.getWorld().spawnEntity(location, EntityType.WITHER);
-				wither.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
-			}
-			return;
-		}
-		if (currWave == 2)
-		{
-			for(int i = 0; i < 20; i ++) {
-				Warden warden = (Warden) location.getWorld().spawnEntity(location, EntityType.WARDEN);
-				warden.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
-			}
-			return;
-		}
-		for(int i = 0; i < 100; i ++) 
-		{
-			Silverfish silverfish = (Silverfish) location.getWorld().spawnEntity(location, EntityType.SILVERFISH);
-            silverfish.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_AQUA + "Dragon's Revenge");
-            silverfish.addPotionEffect(speedEffect);
-		}
-		for(int i = 0; i < 20; i ++) 
-		{
-			Blaze blaze = (Blaze) location.getWorld().spawnEntity(location.clone().add(0,20,0), EntityType.BLAZE);
-			blaze.setCustomName(ChatColor.BOLD + "" + ChatColor.RED + "Dragon's Revenge");
-			blaze.addPotionEffect(speedEffect);
-		}
-		for(int i = 0; i < 20; i ++) 
-		{
-			Ghast ghast = (Ghast) location.getWorld().spawnEntity(location.clone().add(0,20,0), EntityType.GHAST);
-			ghast.setCustomName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Dragon's Revenge");
-			ghast.addPotionEffect(speedEffect);
-		}
-		
-	}
-	
-}

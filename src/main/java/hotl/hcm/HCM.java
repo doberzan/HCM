@@ -1,21 +1,12 @@
 package hotl.hcm;
 
+import hotl.hcm.listeners.*;
 import hotl.hcm.runnables.EndEffects;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import hotl.hcm.commands.HCMCommands;
-import hotl.hcm.listeners.EntityDamageListener;
-import hotl.hcm.listeners.EntityDeathListener;
-import hotl.hcm.listeners.PlayerAchievementAwardedListener;
-import hotl.hcm.listeners.PlayerChangeWorldListener;
-import hotl.hcm.listeners.PlayerChatListener;
-import hotl.hcm.listeners.PlayerDeathListener;
-import hotl.hcm.listeners.PlayerInteractListener;
-import hotl.hcm.listeners.PlayerJoinListener;
-import hotl.hcm.listeners.PlayerMoveListener;
-import hotl.hcm.listeners.PlayerRespawnListener;
 
 public class HCM extends JavaPlugin{
 
@@ -53,6 +44,7 @@ public class HCM extends JavaPlugin{
 		getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this), this);
 		getServer().getPluginManager().registerEvents(new PlayerChatListener(this), this);
+		getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
 		getLogger().info("HCM is now enabled...");
 		
 		//Bukkit.getScheduler().runTaskTimer(this, new DragonBomb(this),0, 20*30);

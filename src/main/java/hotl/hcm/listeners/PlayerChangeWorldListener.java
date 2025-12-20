@@ -53,6 +53,7 @@ public class PlayerChangeWorldListener implements Listener {
 			}
 
         	game.HCMPlayers.get(player.getUniqueId()).setEnteredEnd(true);
+			game.HCMPlayers.get(player.getUniqueId()).setEnteredEndTime(LocalDateTime.now());
 			return;
         }
 
@@ -72,6 +73,7 @@ public class PlayerChangeWorldListener implements Listener {
 				firstPlayerEnteredNether(player);
 			}
 			game.HCMPlayers.get(player.getUniqueId()).setEnteredNether(true);
+			game.HCMPlayers.get(player.getUniqueId()).setEnteredNetherTime(LocalDateTime.now());
         }
     }
 

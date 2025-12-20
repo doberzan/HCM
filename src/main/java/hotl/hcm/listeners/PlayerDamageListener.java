@@ -20,11 +20,9 @@ public class PlayerDamageListener implements Listener {
 
 	@EventHandler
 	public void PlayerDamageEvent(EntityDamageEvent event) {
+		// Disable PVP
 		if (event.getEntityType() == EntityType.PLAYER) {
-			if(!game.isGameRunning())
-			{
 				event.setCancelled(true);
-			}
 		}
 	}
 
